@@ -26,7 +26,7 @@ import { faker } from '@faker-js/faker';
 import { format, parseISO } from 'date-fns';
 
 // types
-import { StatusRecord } from '../@types';
+import { StatusRecord } from '../../@types';
 
 export const statuses = [
   'draft',

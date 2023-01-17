@@ -10,7 +10,7 @@ import {
 import { format, parseISO } from 'date-fns';
 
 // types
-import { StatusRecord } from '../@types';
+import { StatusRecord } from '../../@types';
 
 import { statuses } from './StatusPanel';
 
