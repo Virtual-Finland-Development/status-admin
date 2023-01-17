@@ -2,6 +2,8 @@ import { createContext, useContext } from 'react';
 import { useInterpret, useSelector } from '@xstate/react';
 import { InterpreterFrom } from 'xstate';
 
+import './App.css';
+
 // auth state
 import { authMachine } from '../../state/auth/authMachine';
 

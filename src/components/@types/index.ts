@@ -1,5 +1,5 @@
 export interface StatusRecord {
-  id: number;
+  id: string;
   email: string;
   status: string;
   modified: string;
