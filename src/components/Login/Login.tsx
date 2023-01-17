@@ -31,7 +31,7 @@ function Login() {
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
       <Stack spacing={8} mx="auto" maxW="lg" py={12} px={6} w="md">
         <Stack align="center">
-          <Heading fontSize="4xl">Status Admin</Heading>
+          <Heading fontSize="4xl">VFD Status Admin</Heading>
         </Stack>
         <Box rounded="lg" bg="white" boxShadow="lg" p={8}>
           <form onSubmit={handleSubmit}>

@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-import { useActor } from '@xstate/react';
 import {
   Box,
   Flex,
@@ -17,7 +16,7 @@ import { GlobalStateContext } from '../App/App';
 
 function NavBar() {
   const { authService } = useContext(GlobalStateContext);
-  const [, send] = useActor(authService);
+  const { send } = authService;
 
   const handleLogOutClick = () => {
     send({ type: 'LOG_OUT' });
@@ -33,7 +32,7 @@ function NavBar() {
             fontWeight="bold"
             color="white"
           >
-            Status Admin
+            VFD Status Admin
           </Text>
         </Box>
         <Flex alignItems="center">

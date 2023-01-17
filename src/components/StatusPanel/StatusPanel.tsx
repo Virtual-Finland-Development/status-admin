@@ -1,8 +1,15 @@
 import React from 'react';
-import { Text, List, Card, CardBody } from '@chakra-ui/react';
+import { List } from '@chakra-ui/react';
 import { faker } from '@faker-js/faker';
+import { format } from 'date-fns';
 
-const statuses = [
+// types
+import { StatusRecord } from '../@types';
+
+// components
+import StatusItem from './StatusItem';
+
+export const statuses = [
   'draft',
   'sent',
   'processing',
@@ -10,7 +17,7 @@ const statuses = [
   'done',
 ];
 
-let dummyData: { id: number; email: string; status: string }[] = [];
+let dummyData: StatusRecord[] = [];
 
 for (let i = 0; i < 50; i++) {
   const status = Math.floor(Math.random() * statuses.length);
@@ -18,6 +25,7 @@ for (let i = 0; i < 50; i++) {
     id: i + 1,
     email: faker.internet.email(),
     status: statuses[status],
+    modified: format(new Date(), 'yyyy-MM-dd'),
   });
 }
 
@@ -26,11 +34,7 @@ function StatusPanel() {
     <React.Fragment>
       <List spacing={4}>
         {dummyData.map(item => (
-          <Card key={item.id}>
-            <CardBody>
-              <Text>{item.email}</Text>
-            </CardBody>
-          </Card>
+          <StatusItem key={item.id} item={item} />
         ))}
       </List>
     </React.Fragment>

@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { useInterpret, useActor } from '@xstate/react';
+import { useInterpret, useSelector } from '@xstate/react';
 import { InterpreterFrom } from 'xstate';
 
 // auth state
@@ -16,10 +16,9 @@ export const GlobalStateContext = createContext({
 
 function Content() {
   const { authService } = useContext(GlobalStateContext);
-  const [state] = useActor(authService);
-  const {
-    context: { isLoggedIn },
-  } = state;
+  const isLoggedIn = useSelector(authService, state =>
+    state.matches('authenticated')
+  );
 
   return !isLoggedIn ? <Login /> : <AuthenticatedContainer />;
 }
