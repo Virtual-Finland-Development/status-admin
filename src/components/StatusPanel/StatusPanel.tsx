@@ -1,25 +1,6 @@
 import React from 'react';
-import {
-  Flex,
-  Box,
-  FormControl,
-  FormLabel,
-  Input,
-  Stack,
-  Button,
-  Heading,
-  Text,
-  Container,
-  List,
-  ListItem,
-  Card,
-  CardBody,
-} from '@chakra-ui/react';
+import { Text, List, Card, CardBody } from '@chakra-ui/react';
 import { faker } from '@faker-js/faker';
-
-interface StatusPanelProps {
-  logOut: () => void;
-}
 
 const statuses = [
   'draft',
@@ -40,7 +21,7 @@ for (let i = 0; i < 50; i++) {
   });
 }
 
-function StatusPanel(props: StatusPanelProps) {
+function StatusPanel() {
   return (
     <React.Fragment>
       <List spacing={4}>

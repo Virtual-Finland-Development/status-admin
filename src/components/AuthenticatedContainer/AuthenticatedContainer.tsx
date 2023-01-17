@@ -10,7 +10,7 @@ function AuthenticatedContainer() {
       <NavBar />
       <Flex bg="gray.50">
         <Container maxW="container.xl" my={6}>
-          <StatusPanel logOut={() => {}} />
+          <StatusPanel />
         </Container>
       </Flex>
     </>

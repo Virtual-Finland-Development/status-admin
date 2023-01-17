@@ -17,7 +17,7 @@ import { GlobalStateContext } from '../App/App';
 
 function NavBar() {
   const { authService } = useContext(GlobalStateContext);
-  const [_, send] = useActor(authService);
+  const [, send] = useActor(authService);
 
   const handleLogOutClick = () => {
     send({ type: 'LOG_OUT' });
