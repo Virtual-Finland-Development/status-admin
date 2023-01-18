@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, ReactElement } from 'react';
 import {
   createColumnHelper,
   useReactTable,
@@ -20,13 +20,29 @@ import {
   Td,
   Text,
   chakra,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Input,
+  Checkbox,
+  useDisclosure,
+  Stack,
+  Divider,
 } from '@chakra-ui/react';
-import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons';
+import {
+  TriangleDownIcon,
+  TriangleUpIcon,
+  ChevronDownIcon,
+} from '@chakra-ui/icons';
 import { faker } from '@faker-js/faker';
 import { format, parseISO } from 'date-fns';
 
 // types
 import { StatusRecord } from '../../@types';
+
+// components
+import Modal from '../Modal/Modal';
 
 export const statuses = [
   'draft',
@@ -51,6 +67,13 @@ for (let i = 0; i < 50; i++) {
 const columnHelper = createColumnHelper<StatusRecord>();
 
 const columns = [
+  columnHelper.accessor('id', {
+    cell: info => info.getValue(),
+    header: '',
+    meta: {
+      isSelect: true,
+    },
+  }),
   columnHelper.accessor('email', {
     cell: info => <Text fontWeight="semibold">{info.getValue()}</Text>,
     header: 'User email',
@@ -68,12 +91,73 @@ const columns = [
   }),
 ];
 
+function StatusSelect({
+  handleSelect,
+  handleClose,
+}: {
+  handleSelect: (status: string) => void;
+  handleClose: () => void;
+}) {
+  const [selectedStatus, setSelectedStatus] = useState('draft');
+
+  return (
+    <Stack spacing={6}>
+      <Select
+        bg="white"
+        onChange={({ target }) => setSelectedStatus(target.value)}
+      >
+        {statuses.map(status => (
+          <option key={status} value={status}>
+            {status}
+          </option>
+        ))}
+      </Select>
+      <Flex alignItems="center" justifyContent="end" gap={4}>
+        <Button onClick={handleClose}>Cancel</Button>
+        <Button
+          colorScheme="purple"
+          onClick={() => handleSelect(selectedStatus)}
+        >
+          Save
+        </Button>
+      </Flex>
+    </Stack>
+  );
+}
+
 function StatusTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [search, setSearch] = useState('');
+  const [filteredData, setFilteredData] = useState<StatusRecord[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [modalSettings, setModalSettings] = useState<{
+    title: string;
+    content: ReactElement | string;
+  }>({ title: '', content: '' });
+
+  const {
+    isOpen: modalIsOpen,
+    onOpen: onModalOpen,
+    onClose: onModalClose,
+  } = useDisclosure();
+
+  useEffect(() => {
+    setSelectedIds([]);
+
+    if (search.length) {
+      setFilteredData(
+        dummyData.filter(i =>
+          i.email.toLowerCase().includes(search.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredData(dummyData);
+    }
+  }, [search]);
 
   const table = useReactTable({
     columns,
-    data: dummyData,
+    data: filteredData,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
@@ -81,6 +165,28 @@ function StatusTable() {
       sorting,
     },
   });
+
+  const toggleAllSelected = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.checked) {
+        setSelectedIds(filteredData.map(i => i.id));
+      } else {
+        setSelectedIds([]);
+      }
+    },
+    [filteredData]
+  );
+
+  const toggleSingleSelect = useCallback(
+    (target: EventTarget & HTMLInputElement, recordId: string) => {
+      if (target.checked) {
+        setSelectedIds(ids => [...ids, recordId]);
+      } else {
+        setSelectedIds(ids => ids.filter(id => id !== recordId));
+      }
+    },
+    []
+  );
 
   const handleStatusChange = useCallback((id: string, newStatus: string) => {
     console.log(id);
@@ -91,92 +197,211 @@ function StatusTable() {
     console.log(id);
   }, []);
 
+  const handleBatchUpdate = useCallback(
+    (selectedStatus: string) => {
+      console.log(selectedStatus);
+      console.log(selectedIds);
+      setSelectedIds([]);
+      onModalClose();
+    },
+    [onModalClose, selectedIds]
+  );
+
+  const handleBatchDelete = useCallback(() => {
+    console.log(selectedIds);
+    setSelectedIds([]);
+    onModalClose();
+  }, [onModalClose, selectedIds]);
+
+  const openBatchUpdateModal = useCallback(() => {
+    setModalSettings({
+      title: `Change status for selected (${selectedIds.length})`,
+      content: (
+        <StatusSelect
+          handleSelect={handleBatchUpdate}
+          handleClose={onModalClose}
+        />
+      ),
+    });
+    onModalOpen();
+  }, [handleBatchUpdate, onModalClose, onModalOpen, selectedIds.length]);
+
+  const openBatchDeleteModal = useCallback(() => {
+    setModalSettings({
+      title: `Remove selected (${selectedIds.length})?`,
+      content: (
+        <Stack spacing={6}>
+          <Text>Remove selected?</Text>
+          <Flex alignItems="center" justifyContent="end" gap={4}>
+            <Button onClick={onModalClose}>Cancel</Button>
+            <Button colorScheme="red" onClick={handleBatchDelete}>
+              Remove
+            </Button>
+          </Flex>
+        </Stack>
+      ),
+    });
+    onModalOpen();
+  }, [handleBatchDelete, onModalClose, onModalOpen, selectedIds.length]);
+
   return (
-    <TableContainer
-      bg="white"
-      py={2}
-      px={4}
-      border="1px"
-      rounded="lg"
-      borderColor="gray.100"
-      boxShadow="lg"
-    >
-      <Table variant="striped" colorScheme="gray">
-        <Thead>
-          {table.getHeaderGroups().map(headerGroup => (
-            <Tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <Th
-                  key={header.id}
-                  onClick={header.column.getToggleSortingHandler()}
-                  cursor="pointer"
-                >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
+    <>
+      <TableContainer
+        bg="white"
+        py={2}
+        mx={4}
+        border="1px"
+        rounded="lg"
+        borderColor="purple.100"
+        boxShadow="lg"
+      >
+        <Flex justifyContent="space-between" py={3} mx={4} gap={3}>
+          <Input
+            value={search}
+            onChange={({ target }) => setSearch(target.value)}
+            placeholder="Search"
+            w={{ base: 'auto', md: 'sm' }}
+          />
+          <Menu>
+            <MenuButton
+              as={Button}
+              rightIcon={<ChevronDownIcon />}
+              colorScheme="purple"
+              disabled={!selectedIds.length}
+            >
+              Selected ({selectedIds.length})
+            </MenuButton>
+            <MenuList>
+              <MenuItem onClick={openBatchUpdateModal}>Change status</MenuItem>
+              <MenuItem onClick={openBatchDeleteModal}>
+                Remove selected
+              </MenuItem>
+            </MenuList>
+          </Menu>
+        </Flex>
+        <Divider />
+        <Table variant="striped" colorScheme="gray">
+          <Thead>
+            {table.getHeaderGroups().map(headerGroup => (
+              <Tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => {
+                  const meta = header.column.columnDef.meta;
 
-                  <chakra.span pl="4">
-                    {header.column.getIsSorted() ? (
-                      header.column.getIsSorted() === 'desc' ? (
-                        <TriangleDownIcon aria-label="sorted descending" />
-                      ) : (
-                        <TriangleUpIcon aria-label="sorted ascending" />
-                      )
-                    ) : null}
-                  </chakra.span>
-                </Th>
-              ))}
-            </Tr>
-          ))}
-        </Thead>
-        <Tbody>
-          {table.getRowModel().rows.map(row => (
-            <Tr key={row.id}>
-              {row.getVisibleCells().map(cell => {
-                const meta = cell.column.columnDef.meta;
+                  if (meta?.isSelect) {
+                    return (
+                      <Th key={header.id}>
+                        <Checkbox
+                          colorScheme="purple"
+                          isChecked={
+                            selectedIds.length > 0 &&
+                            selectedIds.length === filteredData.length
+                          }
+                          onChange={toggleAllSelected}
+                        />
+                      </Th>
+                    );
+                  }
 
-                if (meta?.isStatusEdit) {
+                  return (
+                    <Th
+                      key={header.id}
+                      onClick={header.column.getToggleSortingHandler()}
+                      cursor="pointer"
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+
+                      <chakra.span pl="4">
+                        {header.column.getIsSorted() ? (
+                          header.column.getIsSorted() === 'desc' ? (
+                            <TriangleDownIcon aria-label="sorted descending" />
+                          ) : (
+                            <TriangleUpIcon aria-label="sorted ascending" />
+                          )
+                        ) : null}
+                      </chakra.span>
+                    </Th>
+                  );
+                })}
+              </Tr>
+            ))}
+          </Thead>
+          <Tbody>
+            {table.getRowModel().rows.map(row => (
+              <Tr key={row.id}>
+                {row.getVisibleCells().map(cell => {
+                  const meta = cell.column.columnDef.meta;
+
+                  if (meta?.isSelect) {
+                    return (
+                      <Td key={cell.id}>
+                        <Checkbox
+                          bg="white"
+                          colorScheme="purple"
+                          isChecked={selectedIds.some(
+                            id => id === row.original.id
+                          )}
+                          onChange={({ target }) =>
+                            toggleSingleSelect(target, row.original.id)
+                          }
+                        />
+                      </Td>
+                    );
+                  }
+
+                  if (meta?.isStatusEdit) {
+                    return (
+                      <Td key={cell.id}>
+                        <Flex gap={6}>
+                          <Select
+                            bg="white"
+                            defaultValue={cell.getValue() as string}
+                            onChange={({ target }) =>
+                              handleStatusChange(row.original.id, target.value)
+                            }
+                          >
+                            {statuses.map(status => (
+                              <option key={status} value={status}>
+                                {status}
+                              </option>
+                            ))}
+                          </Select>
+                          <Button
+                            colorScheme="red"
+                            variant="outline"
+                            bg="white"
+                            onClick={() => handleDelete(row.original.id)}
+                          >
+                            Remove
+                          </Button>
+                        </Flex>
+                      </Td>
+                    );
+                  }
+
                   return (
                     <Td key={cell.id}>
-                      <Flex gap={6}>
-                        <Select
-                          bg="white"
-                          defaultValue={cell.getValue() as string}
-                          onChange={({ target }) =>
-                            handleStatusChange(row.original.id, target.value)
-                          }
-                        >
-                          {statuses.map(status => (
-                            <option key={status} value={status}>
-                              {status}
-                            </option>
-                          ))}
-                        </Select>
-                        <Button
-                          colorScheme="red"
-                          variant="outline"
-                          bg="white"
-                          onClick={() => handleDelete(row.original.id)}
-                        >
-                          Delete
-                        </Button>
-                      </Flex>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </Td>
                   );
-                }
+                })}
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
 
-                return (
-                  <Td key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </Td>
-                );
-              })}
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-    </TableContainer>
+      <Modal
+        isOpen={modalIsOpen}
+        onClose={onModalClose}
+        modalSettings={modalSettings}
+      />
+    </>
   );
 }
 
