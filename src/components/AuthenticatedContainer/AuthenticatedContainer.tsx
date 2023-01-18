@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { Container } from '@chakra-ui/react';
 
 // components
@@ -7,12 +8,12 @@ import StatusTable from '../StatusTable/StatusTable';
 
 function AuthenticatedContainer() {
   return (
-    <>
+    <Fragment>
       <NavBar />
       <Container maxW="container.lg" my={6}>
         <StatusTable />
       </Container>
-    </>
+    </Fragment>
   );
 }
 

@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect, ReactElement } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect,
+  ReactElement,
+  Fragment,
+} from 'react';
 import {
   createColumnHelper,
   useReactTable,
@@ -42,6 +48,7 @@ import { format, parseISO } from 'date-fns';
 import { StatusRecord } from '../../@types';
 
 // components
+import StatusSelect from './StatusSelect';
 import Modal from '../Modal/Modal';
 
 export const statuses = [
@@ -90,40 +97,6 @@ const columns = [
     },
   }),
 ];
-
-function StatusSelect({
-  handleSelect,
-  handleClose,
-}: {
-  handleSelect: (status: string) => void;
-  handleClose: () => void;
-}) {
-  const [selectedStatus, setSelectedStatus] = useState('draft');
-
-  return (
-    <Stack spacing={6}>
-      <Select
-        bg="white"
-        onChange={({ target }) => setSelectedStatus(target.value)}
-      >
-        {statuses.map(status => (
-          <option key={status} value={status}>
-            {status}
-          </option>
-        ))}
-      </Select>
-      <Flex alignItems="center" justifyContent="end" gap={4}>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button
-          colorScheme="purple"
-          onClick={() => handleSelect(selectedStatus)}
-        >
-          Save
-        </Button>
-      </Flex>
-    </Stack>
-  );
-}
 
 function StatusTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -245,7 +218,7 @@ function StatusTable() {
   }, [handleBatchDelete, onModalClose, onModalOpen, selectedIds.length]);
 
   return (
-    <>
+    <Fragment>
       <TableContainer
         bg="white"
         py={2}
@@ -401,7 +374,7 @@ function StatusTable() {
         onClose={onModalClose}
         modalSettings={modalSettings}
       />
-    </>
+    </Fragment>
   );
 }
 
