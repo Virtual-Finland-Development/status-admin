@@ -12,6 +12,7 @@ import {
   getCoreRowModel,
   SortingState,
   getSortedRowModel,
+  getPaginationRowModel,
 } from '@tanstack/react-table';
 import {
   Flex,
@@ -49,6 +50,7 @@ import { StatusRecord } from '../../@types';
 
 // components
 import StatusSelect from './StatusSelect';
+import TablePagination from './TablePagination';
 import Modal from '../Modal/Modal';
 
 export const statuses = [
@@ -134,8 +136,14 @@ function StatusTable() {
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     state: {
       sorting,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 25,
+      },
     },
   });
 
@@ -367,6 +375,7 @@ function StatusTable() {
             ))}
           </Tbody>
         </Table>
+        <TablePagination {...table} />
       </TableContainer>
 
       <Modal
