@@ -1,23 +1,17 @@
-import { createContext, useContext } from 'react';
-import { useInterpret, useSelector } from '@xstate/react';
-import { InterpreterFrom } from 'xstate';
+import { useContext } from 'react';
+import { useSelector } from '@xstate/react';
 
 import './App.css';
 
-// auth state
-import { authMachine } from '../../state/auth/authMachine';
+// state context
+import { StateContext, StateProvider } from '../../state/StateContext';
 
 // components
 import Login from '../Login/Login';
 import AuthenticatedContainer from '../AuthenticatedContainer/AuthenticatedContainer';
 
-// global context
-export const GlobalStateContext = createContext({
-  authService: {} as InterpreterFrom<typeof authMachine>,
-});
-
 function Content() {
-  const { authService } = useContext(GlobalStateContext);
+  const { authService } = useContext(StateContext);
   const isLoggedIn = useSelector(authService, state =>
     state.matches('authenticated')
   );
@@ -26,12 +20,10 @@ function Content() {
 }
 
 function App() {
-  const authService = useInterpret(authMachine);
-
   return (
-    <GlobalStateContext.Provider value={{ authService }}>
+    <StateProvider>
       <Content />
-    </GlobalStateContext.Provider>
+    </StateProvider>
   );
 }
 

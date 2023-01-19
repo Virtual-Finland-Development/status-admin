@@ -11,10 +11,10 @@ import {
 } from '@chakra-ui/react';
 
 // context
-import { GlobalStateContext } from '../App/App';
+import { StateContext } from '../../state/StateContext';
 
 function Login() {
-  const { authService } = useContext(GlobalStateContext);
+  const { authService } = useContext(StateContext);
   const [formData, setFormData] = useState({ email: '', password: '' });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

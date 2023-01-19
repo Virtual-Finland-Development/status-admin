@@ -12,10 +12,10 @@ import {
 import { ChevronDownIcon } from '@chakra-ui/icons';
 
 // context
-import { GlobalStateContext } from '../App/App';
+import { StateContext } from '../../state/StateContext';
 
 function NavBar() {
-  const { authService } = useContext(GlobalStateContext);
+  const { authService } = useContext(StateContext);
   const { send } = authService;
 
   const handleLogOutClick = () => {
