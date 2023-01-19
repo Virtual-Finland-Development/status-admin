@@ -67,9 +67,12 @@ for (let i = 0; i < 50; i++) {
   const status = Math.floor(Math.random() * statuses.length);
   dummyData.push({
     id: (i + 1).toString(),
-    email: faker.internet.email(),
     status: statuses[status],
     modified: format(new Date(), 'yyyy-MM-dd'),
+    user: {
+      id: faker.random.numeric(16),
+      email: faker.internet.email(),
+    },
   });
 }
 
@@ -83,12 +86,12 @@ const columns = [
       isSelect: true,
     },
   }),
-  columnHelper.accessor('email', {
+  columnHelper.accessor('user.email', {
     cell: info => (
       <Flex flexDirection="column">
         <Text fontWeight="semibold">{info.getValue()}</Text>
         <Text fontSize="sm" fontWeight="light">
-          id: {faker.random.numeric(16)}
+          id: {info.row.original.user.id}
         </Text>
       </Flex>
     ),
@@ -129,7 +132,7 @@ function StatusTable() {
     if (search.length) {
       setFilteredData(
         dummyData.filter(i =>
-          i.email.toLowerCase().includes(search.toLowerCase())
+          i.user.email.toLowerCase().includes(search.toLowerCase())
         )
       );
     } else {

@@ -24,7 +24,7 @@ function StatusItem({ item }: { item: StatusRecord }) {
           alignItems="center"
         >
           <Flex justifyContent="space-between">
-            <Text fontWeight="semibold">{item.email}</Text>
+            <Text fontWeight="semibold">{item.user.email}</Text>
             <Text>{format(parseISO(item.modified), 'yyyy-MM-dd')}</Text>
           </Flex>
           <Flex

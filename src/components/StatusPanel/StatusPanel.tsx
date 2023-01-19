@@ -23,9 +23,12 @@ for (let i = 0; i < 50; i++) {
   const status = Math.floor(Math.random() * statuses.length);
   dummyData.push({
     id: (i + 1).toString(),
-    email: faker.internet.email(),
     status: statuses[status],
     modified: format(new Date(), 'yyyy-MM-dd'),
+    user: {
+      id: faker.random.numeric(16),
+      email: faker.internet.email(),
+    },
   });
 }
 
