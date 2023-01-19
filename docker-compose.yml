@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    image: node:18-alpine
+    command: sh -c "npm install && npm run dev"
+    working_dir: /app
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+    ports:
+      - 5173:5173
