@@ -1,3 +1,4 @@
+import { useCallback, ChangeEvent } from 'react';
 import { Table } from '@tanstack/react-table';
 import { Flex, Select, Text, IconButton } from '@chakra-ui/react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
@@ -5,7 +6,13 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 // types
 import { StatusRecord } from '../../@types';
 
-function TablePagination(props: Table<StatusRecord>) {
+interface TablePaginationProps {
+  table: Table<StatusRecord>;
+  onStateChange: () => void;
+}
+
+function TablePagination(props: TablePaginationProps) {
+  const { table, onStateChange } = props;
   const {
     previousPage,
     getCanPreviousPage,
@@ -14,7 +21,28 @@ function TablePagination(props: Table<StatusRecord>) {
     setPageSize,
     nextPage,
     getCanNextPage,
-  } = props;
+  } = table;
+
+  const changePage = useCallback(
+    (direction: 'prev' | 'next') => {
+      if (direction === 'prev') {
+        previousPage();
+      } else {
+        nextPage();
+      }
+
+      onStateChange();
+    },
+    [nextPage, onStateChange, previousPage]
+  );
+
+  const changePageSize = useCallback(
+    (e: ChangeEvent<HTMLSelectElement>) => {
+      setPageSize(Number(e.target.value));
+      onStateChange();
+    },
+    [onStateChange, setPageSize]
+  );
 
   return (
     <Flex justifyContent="center">
@@ -22,7 +50,7 @@ function TablePagination(props: Table<StatusRecord>) {
         <Flex mr={3}>
           <IconButton
             aria-label="Previous page"
-            onClick={() => previousPage()}
+            onClick={() => changePage('prev')}
             disabled={!getCanPreviousPage()}
             icon={<ChevronLeftIcon h={6} w={6} />}
             colorScheme="purple"
@@ -43,9 +71,7 @@ function TablePagination(props: Table<StatusRecord>) {
           <Select
             w={32}
             value={getState().pagination.pageSize}
-            onChange={e => {
-              setPageSize(Number(e.target.value));
-            }}
+            onChange={changePageSize}
           >
             {[25, 50, 75].map(pageSize => (
               <option key={pageSize} value={pageSize}>
@@ -58,7 +84,7 @@ function TablePagination(props: Table<StatusRecord>) {
         <Flex ml={3}>
           <IconButton
             aria-label="Next page"
-            onClick={() => nextPage()}
+            onClick={() => changePage('next')}
             disabled={!getCanNextPage()}
             icon={<ChevronRightIcon h={6} w={6} />}
             colorScheme="purple"

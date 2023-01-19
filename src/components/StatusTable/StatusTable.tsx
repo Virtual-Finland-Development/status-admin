@@ -149,13 +149,15 @@ function StatusTable() {
 
   const toggleAllSelected = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { rows } = table.getPaginationRowModel();
+
       if (e.target.checked) {
-        setSelectedIds(filteredData.map(i => i.id));
+        setSelectedIds(rows.map(row => row.original.id));
       } else {
         setSelectedIds([]);
       }
     },
-    [filteredData]
+    [table]
   );
 
   const toggleSingleSelect = useCallback(
@@ -275,7 +277,8 @@ function StatusTable() {
                           colorScheme="purple"
                           isChecked={
                             selectedIds.length > 0 &&
-                            selectedIds.length === filteredData.length
+                            selectedIds.length ===
+                              table.getState().pagination.pageSize
                           }
                           onChange={toggleAllSelected}
                         />
@@ -375,7 +378,10 @@ function StatusTable() {
             ))}
           </Tbody>
         </Table>
-        <TablePagination {...table} />
+        <TablePagination
+          table={table}
+          onStateChange={() => setSelectedIds([])}
+        />
       </TableContainer>
 
       <Modal
