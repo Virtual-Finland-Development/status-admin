@@ -84,11 +84,18 @@ const columns = [
     },
   }),
   columnHelper.accessor('email', {
-    cell: info => <Text fontWeight="semibold">{info.getValue()}</Text>,
-    header: 'User email',
+    cell: info => (
+      <Flex flexDirection="column">
+        <Text fontWeight="semibold">{info.getValue()}</Text>
+        <Text fontSize="sm" fontWeight="light">
+          id: {faker.random.numeric(16)}
+        </Text>
+      </Flex>
+    ),
+    header: 'User',
   }),
   columnHelper.accessor('modified', {
-    cell: info => format(parseISO(info.getValue()), 'yyyy-MM-dd'),
+    cell: info => format(parseISO(info.getValue()), 'dd.MM.yyyy HH:mm'),
     header: 'Last modified',
   }),
   columnHelper.accessor('status', {
