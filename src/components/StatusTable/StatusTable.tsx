@@ -161,11 +161,11 @@ function StatusTable() {
   );
 
   const toggleSingleSelect = useCallback(
-    (target: EventTarget & HTMLInputElement, recordId: string) => {
+    (target: EventTarget & HTMLInputElement, id: string) => {
       if (target.checked) {
-        setSelectedIds(ids => [...ids, recordId]);
+        setSelectedIds(ids => [...ids, id]);
       } else {
-        setSelectedIds(ids => ids.filter(id => id !== recordId));
+        setSelectedIds(ids => ids.filter(sId => sId !== id));
       }
     },
     []
@@ -262,7 +262,9 @@ function StatusTable() {
             </MenuList>
           </Menu>
         </Flex>
+
         <Divider />
+
         <Table variant="striped" colorScheme="gray">
           <Thead>
             {table.getHeaderGroups().map(headerGroup => (
@@ -312,6 +314,7 @@ function StatusTable() {
               </Tr>
             ))}
           </Thead>
+
           <Tbody>
             {table.getRowModel().rows.map(row => (
               <Tr key={row.id}>
@@ -378,6 +381,7 @@ function StatusTable() {
             ))}
           </Tbody>
         </Table>
+
         <TablePagination
           table={table}
           onStateChange={() => setSelectedIds([])}
