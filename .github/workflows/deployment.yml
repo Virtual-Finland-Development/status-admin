@@ -41,6 +41,8 @@ jobs:
       - name: Set artifact path in Pulumi config
         working-directory: ./infra
         run: pulumi config set artifactPath ../dist/
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Deploy with Pulumi
         uses: pulumi/actions@v3
         with:

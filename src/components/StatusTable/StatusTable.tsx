@@ -42,8 +42,9 @@ import {
   TriangleUpIcon,
   ChevronDownIcon,
 } from '@chakra-ui/icons';
-import { faker } from '@faker-js/faker';
 import { format, parseISO } from 'date-fns';
+
+import dummyUsers from './dummyUsers.json';
 
 // types
 import { StatusRecord } from '../../@types';
@@ -69,10 +70,7 @@ for (let i = 0; i < 50; i++) {
     id: (i + 1).toString(),
     status: statuses[status],
     modified: format(new Date(), 'yyyy-MM-dd'),
-    user: {
-      id: faker.random.numeric(16),
-      email: faker.internet.email(),
-    },
+    user: dummyUsers[i],
   });
 }
 
