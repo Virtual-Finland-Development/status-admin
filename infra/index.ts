@@ -38,6 +38,12 @@ const cdn = new aws.cloudfront.Distribution(
   `${projectName}-cdn-${env}`,
   {
     enabled: true,
+    defaultRootObject: 'index.html',
+    httpVersion: 'http2',
+    isIpv6Enabled: true,
+    priceClass: 'PriceClass_All',
+    waitForDeployment: true,
+    retainOnDelete: false,
     origins: [
       {
         originId: bucket.arn,
@@ -82,7 +88,6 @@ const cdn = new aws.cloudfront.Distribution(
         viewerProtocolPolicy: 'redirect-to-https',
       },
     ],
-    priceClass: 'PriceClass_All',
     customErrorResponses: [
       {
         errorCode: 404,
