@@ -1,0 +1,4 @@
+config:
+  aws:region: eu-north-1
+  status-admin:errorDocument: index.html
+  status-admin:indexDocument: index.html
