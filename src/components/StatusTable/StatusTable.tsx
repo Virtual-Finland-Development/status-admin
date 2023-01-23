@@ -49,9 +49,13 @@ import dummyUsers from './dummyUsers.json';
 // types
 import { StatusRecord } from '../../@types';
 
+// hooks
+import useStatuses from '../../hooks/useStatuses';
+
 // components
 import StatusSelect from './StatusSelect';
 import TablePagination from './TablePagination';
+import Loading from '../Loading/Loading';
 import Modal from '../Modal/Modal';
 
 export const statuses = [
@@ -117,6 +121,9 @@ function StatusTable() {
     title: string;
     content: ReactElement | string;
   }>({ title: '', content: '' });
+
+  const { data: statusesData, isLoading } = useStatuses();
+  console.log(statusesData);
 
   const {
     isOpen: modalIsOpen,
@@ -234,6 +241,10 @@ function StatusTable() {
     });
     onModalOpen();
   }, [handleBatchDelete, onModalClose, onModalOpen, selectedIds.length]);
+  console.log(isLoading);
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <Fragment>
