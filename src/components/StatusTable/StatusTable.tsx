@@ -123,7 +123,6 @@ function StatusTable() {
   }>({ title: '', content: '' });
 
   // const { data: statusesData, isLoading } = useStatuses();
-  console.log('testing testings...');
 
   const {
     isOpen: modalIsOpen,

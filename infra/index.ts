@@ -162,7 +162,9 @@ new aws.s3.BucketPolicy(`${bucketName}-bucket-policy-${env}`, {
   bucket: bucket.bucket,
   policy: policyForCloudfront.apply(policy => policy.json),
 });
-console.log('asset files:', fs.readdirSync(`${path}/assets`));
+
+// console.log('asset files:', fs.readdirSync(`${path}/assets`));
+
 // Use a synced folder to manage the files of the website.
 new synced_folder.S3BucketFolder(`${projectName}-s3-bucket-folder-${env}`, {
   path: path,
