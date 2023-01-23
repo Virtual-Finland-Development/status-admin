@@ -241,7 +241,7 @@ function StatusTable() {
     });
     onModalOpen();
   }, [handleBatchDelete, onModalClose, onModalOpen, selectedIds.length]);
-  console.log(isLoading);
+
   if (isLoading) {
     return <Loading />;
   }
