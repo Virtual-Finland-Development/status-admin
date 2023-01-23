@@ -5,7 +5,7 @@ import * as synced_folder from '@pulumi/synced-folder';
 
 // Import the program's configuration settings.
 const config = new pulumi.Config();
-const path = config.get('artifactPath') || '../';
+const path = config.get('artifactPath') || '../dist';
 const indexDocument = config.get('indexDocument') || 'index.html';
 const errorDocument = config.get('errorDocument') || 'index.html';
 
