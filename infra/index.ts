@@ -1,6 +1,7 @@
 import * as pulumi from '@pulumi/pulumi';
 import * as aws from '@pulumi/aws';
 import * as synced_folder from '@pulumi/synced-folder';
+import * as fs from 'fs';
 
 // Import the program's configuration settings.
 const config = new pulumi.Config();
@@ -161,7 +162,7 @@ new aws.s3.BucketPolicy(`${bucketName}-bucket-policy-${env}`, {
   bucket: bucket.bucket,
   policy: policyForCloudfront.apply(policy => policy.json),
 });
-
+console.log('asset files:', fs.readdirSync(`${path}/assets`));
 // Use a synced folder to manage the files of the website.
 new synced_folder.S3BucketFolder(`${projectName}-s3-bucket-folder-${env}`, {
   path: path,
