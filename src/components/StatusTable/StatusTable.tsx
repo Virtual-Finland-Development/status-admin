@@ -122,8 +122,7 @@ function StatusTable() {
     content: ReactElement | string;
   }>({ title: '', content: '' });
 
-  const { data: statusesData, isLoading } = useStatuses();
-  console.log(statusesData);
+  // const { data: statusesData, isLoading } = useStatuses();
 
   const {
     isOpen: modalIsOpen,
@@ -242,9 +241,9 @@ function StatusTable() {
     onModalOpen();
   }, [handleBatchDelete, onModalClose, onModalOpen, selectedIds.length]);
 
-  if (isLoading) {
+  /* if (isLoading) {
     return <Loading />;
-  }
+  } */
 
   return (
     <Fragment>
