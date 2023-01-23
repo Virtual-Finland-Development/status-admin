@@ -114,7 +114,7 @@ const cdn = new aws.cloudfront.Distribution(
     },
   },
   {
-    protect: true,
+    protect: false,
   }
 );
 
@@ -168,7 +168,7 @@ new synced_folder.S3BucketFolder(`${projectName}-s3-bucket-folder-${env}`, {
   path: path,
   bucketName: bucket.bucket,
   acl: 'public-read',
-  managedObjects: false,
+  managedObjects: true,
 });
 
 // Export the URLs and hostnames of the bucket and distribution.
