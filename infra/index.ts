@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as pulumi from '@pulumi/pulumi';
 import * as aws from '@pulumi/aws';
 import * as synced_folder from '@pulumi/synced-folder';
@@ -158,24 +157,18 @@ const policyForCloudfront = aws.iam.getPolicyDocumentOutput({
 });
 
 // S3 bucket policy
-const bucketPolocy = new aws.s3.BucketPolicy(
-  `${bucketName}-bucket-policy-${env}`,
-  {
-    bucket: bucket.bucket,
-    policy: policyForCloudfront.apply(policy => policy.json),
-  }
-);
+new aws.s3.BucketPolicy(`${bucketName}-bucket-policy-${env}`, {
+  bucket: bucket.bucket,
+  policy: policyForCloudfront.apply(policy => policy.json),
+});
 
 // Use a synced folder to manage the files of the website.
-const bucketFolder = new synced_folder.S3BucketFolder(
-  `${projectName}-s3-bucket-folder-${env}`,
-  {
-    path: path,
-    bucketName: bucket.bucket,
-    acl: 'public-read',
-    managedObjects: false,
-  }
-);
+new synced_folder.S3BucketFolder(`${projectName}-s3-bucket-folder-${env}`, {
+  path: path,
+  bucketName: bucket.bucket,
+  acl: 'public-read',
+  managedObjects: false,
+});
 
 // Export the URLs and hostnames of the bucket and distribution.
 export const cdnURL = pulumi.interpolate`https://${cdn.domainName}`;
