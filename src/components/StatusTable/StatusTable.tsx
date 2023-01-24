@@ -58,13 +58,14 @@ import TablePagination from './TablePagination';
 import Loading from '../Loading/Loading';
 import Modal from '../Modal/Modal';
 
-export const statuses = [
-  'draft',
-  'sent',
-  'processing',
-  'awaiting additional info',
-  'done',
-];
+export const statuses = ['COMPLETED', 'IN_PROGRESS', 'FAILED', 'CANCELLED'];
+
+const statusLabels: Record<string, string> = {
+  COMPLETED: 'Completed',
+  IN_PROGRESS: 'In progress',
+  FAILED: 'Failed',
+  CANCELLED: 'Cancelled',
+};
 
 let dummyData: StatusRecord[] = [];
 
@@ -72,9 +73,11 @@ for (let i = 0; i < 50; i++) {
   const status = Math.floor(Math.random() * statuses.length);
   dummyData.push({
     id: (i + 1).toString(),
-    status: statuses[status],
-    modified: format(new Date(), 'yyyy-MM-dd'),
-    user: dummyUsers[i],
+    statusName: 'dummyStatus',
+    statusValue: statuses[status],
+    updatedAt: format(new Date(), 'yyyy-MM-dd'),
+    userId: dummyUsers[i].id,
+    userEmail: dummyUsers[i].email,
   });
 }
 
@@ -88,22 +91,22 @@ const columns = [
       isSelect: true,
     },
   }),
-  columnHelper.accessor('user.email', {
+  columnHelper.accessor('userEmail', {
     cell: info => (
       <Flex flexDirection="column">
         <Text fontWeight="semibold">{info.getValue()}</Text>
         <Text fontSize="sm" fontWeight="light">
-          id: {info.row.original.user.id}
+          id: {info.row.original.userId}
         </Text>
       </Flex>
     ),
     header: 'User',
   }),
-  columnHelper.accessor('modified', {
+  columnHelper.accessor('updatedAt', {
     cell: info => format(parseISO(info.getValue()), 'dd.MM.yyyy HH:mm'),
     header: 'Last modified',
   }),
-  columnHelper.accessor('status', {
+  columnHelper.accessor('statusValue', {
     cell: info => info.getValue(),
     header: 'Status',
     meta: {
@@ -122,7 +125,8 @@ function StatusTable() {
     content: ReactElement | string;
   }>({ title: '', content: '' });
 
-  // const { data: statusesData, isLoading } = useStatuses();
+  const { data: statusesData, isLoading } = useStatuses();
+  console.log(statusesData);
 
   const {
     isOpen: modalIsOpen,
@@ -136,7 +140,7 @@ function StatusTable() {
     if (search.length) {
       setFilteredData(
         dummyData.filter(i =>
-          i.user.email.toLowerCase().includes(search.toLowerCase())
+          i.userEmail.toLowerCase().includes(search.toLowerCase())
         )
       );
     } else {
@@ -367,9 +371,9 @@ function StatusTable() {
                               handleStatusChange(row.original.id, target.value)
                             }
                           >
-                            {statuses.map(status => (
-                              <option key={status} value={status}>
-                                {status}
+                            {Object.keys(statusLabels).map(key => (
+                              <option key={key} value={key}>
+                                {statusLabels[key]}
                               </option>
                             ))}
                           </Select>

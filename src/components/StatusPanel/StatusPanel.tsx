@@ -24,9 +24,11 @@ for (let i = 0; i < 50; i++) {
   const status = Math.floor(Math.random() * statuses.length);
   dummyData.push({
     id: (i + 1).toString(),
-    status: statuses[status],
-    modified: format(new Date(), 'yyyy-MM-dd'),
-    user: dummyUsers[i],
+    statusName: 'dummyStatus',
+    statusValue: statuses[status],
+    updatedAt: format(new Date(), 'yyyy-MM-dd'),
+    userId: dummyUsers[i].id,
+    userEmail: dummyUsers[i].email,
   });
 }
 

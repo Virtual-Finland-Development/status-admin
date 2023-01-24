@@ -1,9 +1,8 @@
 export interface StatusRecord {
   id: string;
-  status: string;
-  modified: string;
-  user: {
-    email: string;
-    id: string;
-  };
+  statusName: string;
+  statusValue: string;
+  updatedAt: string;
+  userId: string;
+  userEmail: string;
 }

@@ -8,6 +8,7 @@ export default function useStatuses() {
     async () => await api.statuses.getAll(),
     {
       refetchOnWindowFocus: false,
+      enabled: Boolean(import.meta.env.DEV),
     }
   );
 
