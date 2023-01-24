@@ -24,18 +24,18 @@ function StatusItem({ item }: { item: StatusRecord }) {
           alignItems="center"
         >
           <Flex justifyContent="space-between">
-            <Text fontWeight="semibold">{item.user.email}</Text>
-            <Text>{format(parseISO(item.modified), 'yyyy-MM-dd')}</Text>
+            <Text fontWeight="semibold">{item.userEmail}</Text>
+            <Text>{format(parseISO(item.updatedAt), 'yyyy-MM-dd')}</Text>
           </Flex>
           <Flex
             flexDirection="row"
             justifyContent={{ base: 'space-between', md: 'end' }}
             gap={6}
           >
-            <Select defaultValue={item.status} w="auto">
-              {statuses.map(status => (
-                <option key={status} value={status}>
-                  {status}
+            <Select defaultValue={item.statusValue} w="auto">
+              {Object.keys(statuses).map(key => (
+                <option key={key} value={key}>
+                  {statuses[key]}
                 </option>
               ))}
             </Select>

@@ -58,9 +58,9 @@ import TablePagination from './TablePagination';
 import Loading from '../Loading/Loading';
 import Modal from '../Modal/Modal';
 
-export const statuses = ['COMPLETED', 'IN_PROGRESS', 'FAILED', 'CANCELLED'];
+export const statusValues = ['COMPLETED', 'IN_PROGRESS', 'FAILED', 'CANCELLED'];
 
-const statusLabels: Record<string, string> = {
+export const statuses: Record<string, string> = {
   COMPLETED: 'Completed',
   IN_PROGRESS: 'In progress',
   FAILED: 'Failed',
@@ -70,11 +70,11 @@ const statusLabels: Record<string, string> = {
 let dummyData: StatusRecord[] = [];
 
 for (let i = 0; i < 50; i++) {
-  const status = Math.floor(Math.random() * statuses.length);
+  const status = Math.floor(Math.random() * statusValues.length);
   dummyData.push({
     id: (i + 1).toString(),
     statusName: 'dummyStatus',
-    statusValue: statuses[status],
+    statusValue: statusValues[status],
     updatedAt: format(new Date(), 'yyyy-MM-dd'),
     userId: dummyUsers[i].id,
     userEmail: dummyUsers[i].email,
@@ -371,9 +371,9 @@ function StatusTable() {
                               handleStatusChange(row.original.id, target.value)
                             }
                           >
-                            {Object.keys(statusLabels).map(key => (
+                            {Object.keys(statuses).map(key => (
                               <option key={key} value={key}>
-                                {statusLabels[key]}
+                                {statuses[key]}
                               </option>
                             ))}
                           </Select>
