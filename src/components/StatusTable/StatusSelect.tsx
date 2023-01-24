@@ -18,9 +18,9 @@ function StatusSelect({
         bg="white"
         onChange={({ target }) => setSelectedStatus(target.value)}
       >
-        {statuses.map(status => (
-          <option key={status} value={status}>
-            {status}
+        {Object.keys(statuses).map(key => (
+          <option key={key} value={key}>
+            {statuses[key]}
           </option>
         ))}
       </Select>
