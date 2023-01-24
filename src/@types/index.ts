@@ -1,3 +1,7 @@
+export interface StatusType {
+  statusValue: string;
+  label: string;
+}
 export interface StatusRecord {
   id: string;
   statusName: string;

@@ -36,20 +36,21 @@ import {
   useDisclosure,
   Stack,
   Divider,
+  useToast,
 } from '@chakra-ui/react';
 import {
   TriangleDownIcon,
   TriangleUpIcon,
   ChevronDownIcon,
+  RepeatIcon,
 } from '@chakra-ui/icons';
 import { format, parseISO } from 'date-fns';
-
-import dummyUsers from './dummyUsers.json';
 
 // types
 import { StatusRecord } from '../../@types';
 
 // hooks
+import useStatusesMeta from '../../hooks/useStatusesMeta';
 import useStatuses from '../../hooks/useStatuses';
 
 // components
@@ -57,29 +58,7 @@ import StatusSelect from './StatusSelect';
 import TablePagination from './TablePagination';
 import Loading from '../Loading/Loading';
 import Modal from '../Modal/Modal';
-
-export const statusValues = ['COMPLETED', 'IN_PROGRESS', 'FAILED', 'CANCELLED'];
-
-export const statuses: Record<string, string> = {
-  COMPLETED: 'Completed',
-  IN_PROGRESS: 'In progress',
-  FAILED: 'Failed',
-  CANCELLED: 'Cancelled',
-};
-
-let dummyData: StatusRecord[] = [];
-
-for (let i = 0; i < 50; i++) {
-  const status = Math.floor(Math.random() * statusValues.length);
-  dummyData.push({
-    id: (i + 1).toString(),
-    statusName: 'dummyStatus',
-    statusValue: statusValues[status],
-    updatedAt: format(new Date(), 'yyyy-MM-dd'),
-    userId: dummyUsers[i].id,
-    userEmail: dummyUsers[i].email,
-  });
-}
+import api from '../../api';
 
 const columnHelper = createColumnHelper<StatusRecord>();
 
@@ -125,8 +104,13 @@ function StatusTable() {
     content: ReactElement | string;
   }>({ title: '', content: '' });
 
-  const { data: statusesData, isLoading } = useStatuses();
-  console.log(statusesData);
+  const { data: statusesMeta, isLoading: metaLoading } = useStatusesMeta();
+  const {
+    data: statusRecords,
+    isLoading: recordsLoading,
+    isFetching: recordsFetching,
+    refetch,
+  } = useStatuses();
 
   const {
     isOpen: modalIsOpen,
@@ -134,19 +118,7 @@ function StatusTable() {
     onClose: onModalClose,
   } = useDisclosure();
 
-  useEffect(() => {
-    setSelectedIds([]);
-
-    if (search.length) {
-      setFilteredData(
-        dummyData.filter(i =>
-          i.userEmail.toLowerCase().includes(search.toLowerCase())
-        )
-      );
-    } else {
-      setFilteredData(dummyData);
-    }
-  }, [search]);
+  const toast = useToast();
 
   const table = useReactTable({
     columns,
@@ -165,6 +137,28 @@ function StatusTable() {
     },
   });
 
+  /**
+   * Set filtered data to state, depending on search
+   */
+  useEffect(() => {
+    if (!recordsLoading) {
+      setSelectedIds([]);
+
+      if (search.length) {
+        setFilteredData(
+          statusRecords!.filter(i =>
+            i.userEmail.toLowerCase().includes(search.toLowerCase())
+          )
+        );
+      } else {
+        setFilteredData(statusRecords!);
+      }
+    }
+  }, [recordsLoading, search, statusRecords]);
+
+  /**
+   * Toggle all records selected / de-selected
+   */
   const toggleAllSelected = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { rows } = table.getPaginationRowModel();
@@ -178,6 +172,9 @@ function StatusTable() {
     [table]
   );
 
+  /**
+   * Toggle single record selection
+   */
   const toggleSingleSelect = useCallback(
     (target: EventTarget & HTMLInputElement, id: string) => {
       if (target.checked) {
@@ -189,14 +186,63 @@ function StatusTable() {
     []
   );
 
-  const handleStatusChange = useCallback((id: string, newStatus: string) => {
-    console.log(id);
-    console.log(newStatus);
-  }, []);
+  /**
+   * Update status for single record
+   */
+  const handleStatusChange = useCallback(
+    async (id: string, newStatus: string) => {
+      try {
+        const updatedRecord = await api.statuses.updateSingle(id, newStatus);
+        setFilteredData(data =>
+          data.map(r => (r.id === id ? updatedRecord : r))
+        );
+        toast({
+          title: 'Updated',
+          description: 'Status record updated.',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: 'Could not update status record.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+    [toast]
+  );
 
-  const handleDelete = useCallback((id: string) => {
-    console.log(id);
-  }, []);
+  /**
+   * Delete single status record
+   */
+  const handleDelete = useCallback(
+    async (id: string) => {
+      try {
+        await api.statuses.deleteSingle(id);
+        setFilteredData(data => data.filter(r => r.id !== id));
+        toast({
+          title: 'Removed',
+          description: 'Status record removed.',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: 'Could not remove status record.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+    [toast]
+  );
 
   const handleBatchUpdate = useCallback(
     (selectedStatus: string) => {
@@ -245,8 +291,33 @@ function StatusTable() {
     onModalOpen();
   }, [handleBatchDelete, onModalClose, onModalOpen, selectedIds.length]);
 
-  if (isLoading) {
+  if (metaLoading || recordsLoading) {
     return <Loading />;
+  }
+
+  if (!statusRecords?.length) {
+    return (
+      <Flex
+        bg="white"
+        p={6}
+        border="1px"
+        rounded="lg"
+        borderColor="purple.100"
+        boxShadow="lg"
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        <Text fontWeight="semibold">No status records found.</Text>
+        <Button
+          colorScheme="purple"
+          rightIcon={<RepeatIcon />}
+          isLoading={recordsFetching}
+          onClick={() => refetch()}
+        >
+          Refresh
+        </Button>
+      </Flex>
+    );
   }
 
   return (
@@ -371,11 +442,15 @@ function StatusTable() {
                               handleStatusChange(row.original.id, target.value)
                             }
                           >
-                            {Object.keys(statuses).map(key => (
-                              <option key={key} value={key}>
-                                {statuses[key]}
-                              </option>
-                            ))}
+                            {statusesMeta &&
+                              statusesMeta.map(item => (
+                                <option
+                                  key={item.statusValue}
+                                  value={item.statusValue}
+                                >
+                                  {item.label}
+                                </option>
+                              ))}
                           </Select>
                           <Button
                             colorScheme="red"
