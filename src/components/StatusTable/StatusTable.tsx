@@ -245,9 +245,9 @@ function StatusTable() {
     onModalOpen();
   }, [handleBatchDelete, onModalClose, onModalOpen, selectedIds.length]);
 
-  /* if (isLoading) {
+  if (isLoading) {
     return <Loading />;
-  } */
+  }
 
   return (
     <Fragment>
