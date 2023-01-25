@@ -8,7 +8,6 @@ export default function useStatusesMeta() {
     async () => await api.statuses.getMeta(),
     {
       refetchOnWindowFocus: false,
-      enabled: Boolean(import.meta.env.DEV),
     }
   );
 
