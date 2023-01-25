@@ -17,6 +17,7 @@ import {
 import {
   Flex,
   Button,
+  IconButton,
   Select,
   TableContainer,
   Table,
@@ -295,7 +296,7 @@ function StatusTable() {
     return <Loading />;
   }
 
-  if (!statusRecords?.length) {
+  if (statusRecords?.length) {
     return (
       <Flex
         bg="white"
@@ -331,29 +332,51 @@ function StatusTable() {
         borderColor="purple.100"
         boxShadow="lg"
       >
-        <Flex justifyContent="space-between" py={3} mx={4} gap={3}>
+        <Flex
+          justifyContent="space-between"
+          flexWrap="wrap"
+          py={3}
+          mx={4}
+          gap={3}
+        >
           <Input
             value={search}
             onChange={({ target }) => setSearch(target.value)}
             placeholder="Search"
-            w={{ base: 'auto', md: 'sm' }}
+            w={{ base: 'full', md: 'sm' }}
           />
-          <Menu>
-            <MenuButton
-              as={Button}
-              rightIcon={<ChevronDownIcon />}
+          <Flex
+            gap={3}
+            justifyContent={{ base: 'space-between' }}
+            w={{ base: 'full', md: 'auto' }}
+          >
+            <IconButton
               colorScheme="purple"
-              disabled={!selectedIds.length}
-            >
-              Selected ({selectedIds.length})
-            </MenuButton>
-            <MenuList>
-              <MenuItem onClick={openBatchUpdateModal}>Change status</MenuItem>
-              <MenuItem onClick={openBatchDeleteModal}>
-                Remove selected
-              </MenuItem>
-            </MenuList>
-          </Menu>
+              variant="outline"
+              aria-label="refresh"
+              icon={<RepeatIcon />}
+              isLoading={recordsFetching}
+              onClick={() => refetch()}
+            />
+            <Menu>
+              <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                colorScheme="purple"
+                disabled={!selectedIds.length}
+              >
+                Selected ({selectedIds.length})
+              </MenuButton>
+              <MenuList>
+                <MenuItem onClick={openBatchUpdateModal}>
+                  Change status
+                </MenuItem>
+                <MenuItem onClick={openBatchDeleteModal}>
+                  Remove selected
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </Flex>
         </Flex>
 
         <Divider />
