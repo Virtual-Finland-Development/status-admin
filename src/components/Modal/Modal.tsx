@@ -21,7 +21,14 @@ function Modal(props: ModalProps) {
   const { isOpen, onClose, modalSettings } = props;
 
   return (
-    <ChakraModal isCentered size="md" isOpen={isOpen} onClose={onClose}>
+    <ChakraModal
+      isCentered
+      closeOnEsc={false}
+      closeOnOverlayClick={false}
+      size="md"
+      isOpen={isOpen}
+      onClose={onClose}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{modalSettings.title}</ModalHeader>

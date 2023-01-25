@@ -35,7 +35,6 @@ import {
   Input,
   Checkbox,
   useDisclosure,
-  Stack,
   Divider,
   useToast,
 } from '@chakra-ui/react';
@@ -55,11 +54,12 @@ import useStatusesMeta from '../../hooks/useStatusesMeta';
 import useStatuses from '../../hooks/useStatuses';
 
 // components
-import StatusSelect from './StatusSelect';
+import StatusBatchSelect from './StatusBatchSelect';
 import TablePagination from './TablePagination';
 import Loading from '../Loading/Loading';
 import Modal from '../Modal/Modal';
 import api from '../../api';
+import StatusesBatchDelete from './StatusesBatchDelete';
 
 const columnHelper = createColumnHelper<StatusRecord>();
 
@@ -245,52 +245,43 @@ function StatusTable() {
     [toast]
   );
 
-  const handleBatchUpdate = useCallback(
-    (selectedStatus: string) => {
-      console.log(selectedStatus);
-      console.log(selectedIds);
-      setSelectedIds([]);
-      onModalClose();
-    },
-    [onModalClose, selectedIds]
-  );
-
-  const handleBatchDelete = useCallback(() => {
-    console.log(selectedIds);
-    setSelectedIds([]);
-    onModalClose();
-  }, [onModalClose, selectedIds]);
-
+  /**
+   * Open batch update modal
+   */
   const openBatchUpdateModal = useCallback(() => {
     setModalSettings({
       title: `Change status for selected (${selectedIds.length})`,
       content: (
-        <StatusSelect
-          handleSelect={handleBatchUpdate}
-          handleClose={onModalClose}
+        <StatusBatchSelect
+          selectedIds={selectedIds}
+          handleClose={() => {
+            onModalClose();
+            refetch();
+          }}
         />
       ),
     });
     onModalOpen();
-  }, [handleBatchUpdate, onModalClose, onModalOpen, selectedIds.length]);
+  }, [onModalClose, onModalOpen, refetch, selectedIds]);
 
+  /**
+   * Open batch delete modal
+   */
   const openBatchDeleteModal = useCallback(() => {
     setModalSettings({
       title: `Remove selected (${selectedIds.length})?`,
       content: (
-        <Stack spacing={6}>
-          <Text>Remove selected?</Text>
-          <Flex alignItems="center" justifyContent="end" gap={4}>
-            <Button onClick={onModalClose}>Cancel</Button>
-            <Button colorScheme="red" onClick={handleBatchDelete}>
-              Remove
-            </Button>
-          </Flex>
-        </Stack>
+        <StatusesBatchDelete
+          selectedIds={selectedIds}
+          handleClose={() => {
+            onModalClose();
+            refetch();
+          }}
+        />
       ),
     });
     onModalOpen();
-  }, [handleBatchDelete, onModalClose, onModalOpen, selectedIds.length]);
+  }, [onModalClose, onModalOpen, refetch, selectedIds]);
 
   if (metaLoading || recordsLoading) {
     return <Loading />;
@@ -460,7 +451,7 @@ function StatusTable() {
                         <Flex gap={6}>
                           <Select
                             bg="white"
-                            defaultValue={cell.getValue() as string}
+                            value={cell.getValue() as string}
                             onChange={({ target }) =>
                               handleStatusChange(row.original.id, target.value)
                             }
