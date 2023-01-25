@@ -27,9 +27,21 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      - name: status-info-api url from Pulumi
+        if: ${{ inputs.deployment_stage }}
+        uses: Virtual-Finland-Development/pulumi-outputs-action@v1
+        id: status-info-api-url
+        with:
+          organization: virtualfinland
+          project: status-info-api
+          stack: ${{ inputs.deployment_stage }}
+          resource: url
+          access-token: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: App build
         if: ${{ inputs.deployment_stage }}
         run: npm install && npm run build
+        env:
+          VITE_STATUS_INFO_API_BASE_URL: ${{ steps.status-info-api-url.outputs.resource-output }}
       - name: Archive the build artifacts
         if: ${{ inputs.wants_artifacts }}
         uses: actions/upload-artifact@v3
