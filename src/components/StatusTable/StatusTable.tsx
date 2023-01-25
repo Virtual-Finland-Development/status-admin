@@ -296,7 +296,7 @@ function StatusTable() {
     return <Loading />;
   }
 
-  if (statusRecords?.length) {
+  if (!statusRecords?.length) {
     return (
       <Flex
         bg="white"
