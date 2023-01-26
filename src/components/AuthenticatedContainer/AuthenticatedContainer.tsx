@@ -9,7 +9,7 @@ function AuthenticatedContainer() {
   return (
     <Fragment>
       <NavBar />
-      <Container maxW="container.lg" my={6}>
+      <Container maxW="container.xl" my={6}>
         <StatusTable />
       </Container>
     </Fragment>

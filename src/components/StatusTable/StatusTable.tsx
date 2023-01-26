@@ -87,6 +87,10 @@ const columns = [
     cell: info => format(parseISO(info.getValue()), 'dd.MM.yyyy HH:mm'),
     header: 'Last modified',
   }),
+  columnHelper.accessor('statusName', {
+    cell: info => info.getValue(),
+    header: 'Identity',
+  }),
   columnHelper.accessor('statusValue', {
     cell: info => info.getValue(),
     header: 'Status',
