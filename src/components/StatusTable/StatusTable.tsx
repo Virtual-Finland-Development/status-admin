@@ -2,6 +2,7 @@ import {
   useState,
   useCallback,
   useEffect,
+  useMemo,
   ReactElement,
   Fragment,
 } from 'react';
@@ -137,6 +138,17 @@ function StatusTable() {
       },
     },
   });
+
+  /**
+   * Evaluate if all rows in current page are selected
+   */
+  const allInPageSelected = useMemo(() => {
+    if (!selectedIds.length) return false;
+    const pageRowsIds = table
+      .getPaginationRowModel()
+      .rows.map(r => r.original.id);
+    return pageRowsIds.every(id => selectedIds.includes(id));
+  }, [selectedIds, table]);
 
   /**
    * Set filtered data to state, depending on search
@@ -384,11 +396,7 @@ function StatusTable() {
                       <Th key={header.id}>
                         <Checkbox
                           colorScheme="purple"
-                          isChecked={
-                            selectedIds.length > 0 &&
-                            selectedIds.length ===
-                              table.getState().pagination.pageSize
-                          }
+                          isChecked={allInPageSelected}
                           onChange={toggleAllSelected}
                         />
                       </Th>
