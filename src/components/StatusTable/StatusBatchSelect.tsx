@@ -17,10 +17,11 @@ import api from '../../api';
 interface StatusBatchSelectProps {
   selectedIds: string[];
   handleClose: () => void;
+  onSuccess: (updated: Partial<StatusRecord>[]) => void;
 }
 
 function StatusBatchSelect(props: StatusBatchSelectProps) {
-  const { selectedIds, handleClose } = props;
+  const { selectedIds, handleClose, onSuccess } = props;
   const [selectedStatus, setSelectedStatus] = useState('SENT');
   const { data: statusesMeta, isLoading: metaLoading } = useStatusesMeta();
 
@@ -29,7 +30,7 @@ function StatusBatchSelect(props: StatusBatchSelectProps) {
   const { mutate, isLoading } = useMutation({
     mutationFn: (records: Partial<StatusRecord>[]) =>
       api.statuses.updateMultiple(records),
-    onSuccess: () => {
+    onSuccess: (_, records) => {
       toast({
         title: 'Updated',
         description: 'Status records updated.',
@@ -37,7 +38,7 @@ function StatusBatchSelect(props: StatusBatchSelectProps) {
         duration: 3000,
         isClosable: true,
       });
-      handleClose();
+      onSuccess(records);
     },
     onError: () => {
       toast({

@@ -11,17 +11,18 @@ import api from '../../api';
 interface StatusesBatchDeleteProps {
   selectedIds: string[];
   handleClose: () => void;
+  onSuccess: (ids: string[]) => void;
 }
 
 function StatusesBatchDelete(props: StatusesBatchDeleteProps) {
-  const { selectedIds, handleClose } = props;
+  const { selectedIds, handleClose, onSuccess } = props;
 
   const toast = useToast();
 
   const { mutate, isLoading } = useMutation({
     mutationFn: (records: Partial<StatusRecord>[]) =>
       api.statuses.deleteMultiple(records),
-    onSuccess: () => {
+    onSuccess: (_, records) => {
       toast({
         title: 'Updated',
         description: 'Status records removed.',
@@ -29,7 +30,7 @@ function StatusesBatchDelete(props: StatusesBatchDeleteProps) {
         duration: 3000,
         isClosable: true,
       });
-      handleClose();
+      onSuccess(records.map(r => r.id || ''));
     },
     onError: () => {
       toast({

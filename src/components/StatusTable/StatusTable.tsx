@@ -266,15 +266,27 @@ function StatusTable() {
       content: (
         <StatusBatchSelect
           selectedIds={selectedIds}
-          handleClose={() => {
+          handleClose={onModalClose}
+          onSuccess={updated => {
+            setFilteredData(data =>
+              data.map(record => {
+                const match = updated.find(u => u.id === record.id);
+                return match
+                  ? {
+                      ...record,
+                      statusValue: match.statusValue || record.statusValue,
+                    }
+                  : record;
+              })
+            );
+            setSelectedIds([]);
             onModalClose();
-            refetch();
           }}
         />
       ),
     });
     onModalOpen();
-  }, [onModalClose, onModalOpen, refetch, selectedIds]);
+  }, [onModalClose, onModalOpen, selectedIds]);
 
   /**
    * Open batch delete modal
@@ -285,15 +297,17 @@ function StatusTable() {
       content: (
         <StatusesBatchDelete
           selectedIds={selectedIds}
-          handleClose={() => {
+          handleClose={onModalClose}
+          onSuccess={ids => {
+            setFilteredData(data => data.filter(({ id }) => !ids.includes(id)));
+            setSelectedIds([]);
             onModalClose();
-            refetch();
           }}
         />
       ),
     });
     onModalOpen();
-  }, [onModalClose, onModalOpen, refetch, selectedIds]);
+  }, [onModalClose, onModalOpen, selectedIds]);
 
   if (metaLoading || recordsLoading) {
     return <Loading />;
