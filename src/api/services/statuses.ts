@@ -28,8 +28,26 @@ export async function updateSingle(
   return data;
 }
 
+export async function updateMultiple(
+  records: Partial<StatusRecord>[]
+): Promise<void> {
+  await axiosInstance.post(
+    `${STATUS_INFO_API_BASE_URL}/status-admin/status-infos`,
+    records
+  );
+}
+
 export async function deleteSingle(id: string): Promise<void> {
   await axiosInstance.delete(
     `${STATUS_INFO_API_BASE_URL}/status-admin/status-infos/${id}`
+  );
+}
+
+export async function deleteMultiple(
+  records: Partial<StatusRecord>[]
+): Promise<void> {
+  await axiosInstance.delete(
+    `${STATUS_INFO_API_BASE_URL}/status-admin/status-infos`,
+    { data: records }
   );
 }
