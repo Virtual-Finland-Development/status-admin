@@ -6,9 +6,20 @@ import { STATUS_INFO_API_BASE_URL } from './endpoints';
 
 const axiosInstance = axios.create();
 
+let cancelRequests = false;
+
 axiosInstance.interceptors.request.use(
   config => {
     const idToken = localStorage.getItem('auth');
+    const isLoginRequest = config.url && config.url.includes('login');
+
+    if (isLoginRequest && cancelRequests) {
+      cancelRequests = false;
+    }
+
+    if (cancelRequests) {
+      throw new axios.Cancel('Request cancelled due to token expiration.');
+    }
 
     if (config.url && config.headers) {
       if (config.url.includes(`${STATUS_INFO_API_BASE_URL}/status-admin/`)) {
@@ -30,6 +41,7 @@ axiosInstance.interceptors.response.use(
       : null;
 
     if (decodedToken?.exp && isPast(fromUnixTime(decodedToken.exp))) {
+      cancelRequests = true;
       alert('Your session has expired, please authenticate to continue.');
       window.postMessage('auth-expired');
       return new Promise(() => {});
