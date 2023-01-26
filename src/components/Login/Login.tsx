@@ -8,23 +8,44 @@ import {
   Stack,
   Button,
   Heading,
+  useToast,
 } from '@chakra-ui/react';
 
 // context
 import { StateContext } from '../../state/StateContext';
 
+// api
+import api from '../../api';
+
 function Login() {
   const { authService } = useContext(StateContext);
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const toast = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
-    authService.send({ type: 'LOG_IN', id: '123' });
+    setIsLoading(true);
+
+    try {
+      const { idToken } = await api.auth.logIn(formData);
+      authService.send({ type: 'LOG_IN', idToken });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Invalid credentials',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -36,21 +57,24 @@ function Login() {
         <Box rounded="lg" bg="white" boxShadow="lg" p={8}>
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
-              <FormControl id="email">
-                <FormLabel>Email address</FormLabel>
+              <FormControl id="username" isRequired>
+                <FormLabel>User name</FormLabel>
                 <Input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  name="username"
+                  value={formData.username}
+                  isRequired
+                  isDisabled={isLoading}
                   onChange={handleInputChange}
                 />
               </FormControl>
-              <FormControl id="password">
+              <FormControl id="password" isRequired>
                 <FormLabel>Password</FormLabel>
                 <Input
                   type="password"
                   name="password"
                   value={formData.password}
+                  isRequired
+                  isDisabled={isLoading}
                   onChange={handleInputChange}
                 />
               </FormControl>
@@ -62,6 +86,8 @@ function Login() {
                   _hover={{
                     bg: 'purple.500',
                   }}
+                  isLoading={isLoading}
+                  isDisabled={isLoading}
                 >
                   Log in
                 </Button>

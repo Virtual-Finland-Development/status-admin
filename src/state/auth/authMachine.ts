@@ -4,7 +4,7 @@ interface AuthContext {
   isLoggedIn: boolean;
 }
 
-type LoginEvent = { type: 'LOG_IN'; id: string };
+type LoginEvent = { type: 'LOG_IN'; idToken: string };
 type LogOutEvent = { type: 'LOG_OUT' };
 type AuthEvent = LoginEvent | LogOutEvent;
 
@@ -46,7 +46,7 @@ const createAuthMachine = (storedAuth: string | null) =>
           isLoggedIn: true,
         }),
         storeAuth: (_, event: LoginEvent) => {
-          localStorage.setItem('auth', event.id);
+          localStorage.setItem('auth', event.idToken);
         },
         logOut: assign({
           isLoggedIn: false,
