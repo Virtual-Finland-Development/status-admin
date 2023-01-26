@@ -1,4 +1,4 @@
-import { createContext, ReactElement, useCallback, useEffect } from 'react';
+import { createContext, ReactElement, useEffect } from 'react';
 import { InterpreterFrom } from 'xstate';
 import { useInterpret } from '@xstate/react';
 
