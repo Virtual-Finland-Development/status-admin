@@ -1,4 +1,4 @@
-import { createContext, ReactElement } from 'react';
+import { createContext, ReactElement, useEffect } from 'react';
 import { InterpreterFrom } from 'xstate';
 import { useInterpret } from '@xstate/react';
 
@@ -11,6 +11,18 @@ const StateContext = createContext({
 
 function StateProvider({ children }: { children: ReactElement }) {
   const authService = useInterpret(authMachine);
+
+  useEffect(() => {
+    const onWindowMessageEvent = (event: MessageEvent) => {
+      if (event.data === 'auth-expired') {
+        authService.send('LOG_OUT');
+      }
+    };
+
+    window.addEventListener('message', onWindowMessageEvent);
+
+    return () => window.removeEventListener('message', onWindowMessageEvent);
+  }, [authService]);
 
   return (
     <StateContext.Provider value={{ authService }}>
